@@ -118,7 +118,6 @@ DiskSpaceInfo getDiskSpaceInfo(const char *path)
 void *rpc(void *arg)
 {
   // RPC thread
-  bool first = true;
   while (run)
   {
     char c[256];
@@ -135,17 +134,7 @@ void *rpc(void *arg)
     // ram total
     sa_sys_ram_total = getmemramtotal();
 
-    if (first)
-    {
-      first = false;
-    }
-    else
-    {
-      printf("\x1b[s");
-      printf("\x1b[2A");
-      printf("\x1b[2K\r");
-    }
-
+    printf("\x1b[s");
     printf("DIGIBYTENODE.COM CONNECT 1.0.2.8 %s\n", c);
     printf("API KEY: %s\n", c_dgbn_api);
     printf("\x1b[u");
