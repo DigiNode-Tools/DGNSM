@@ -1,7 +1,7 @@
 // ini
 #include <iostream>
 #include <sstream>
-#include "jj_INIReader.h"
+#include "jj_ini.h"
 // ini
 
 #include <stdio.h>
