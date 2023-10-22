@@ -1,8 +1,9 @@
-CXXFLAGS = -O3 -g0
-LDFLAGS = $(CXXFLAGS)
+CXX = g++
+CXXFLAGS = -std=c++11 -Wall
+LDFLAGS = -lcurl
 
 digibyte-connect:  main.o
-	g++ -pthread $(LDFLAGS) -o digibyte-connect main.o
+	$(CXX) $(CXXFLAGS) -o digibyte-connect main.o $(LDFLAGS)
 
 %.o: %.cpp *.h
-	g++ -std=c++11 -pthread $(CXXFLAGS) -Wall -Wno-unused -Wno-sign-compare -Wno-reorder -Wno-comment -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -Wall -Wno-unused -Wno-sign-compare -Wno-reorder -Wno-comment -c -o $@ $<
