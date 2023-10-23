@@ -260,7 +260,7 @@ void stop_thread(int signo)
 
 int main()
 {
-  INIReader reader("dgbn.ini");
+  JJINI reader("dgbn.ini");
   // api key
   std::string dgbn_api = reader.Get("hardware", "api", "");
   c_dgbn_api = strcpy(new char[dgbn_api.length() + 1], dgbn_api.c_str());
