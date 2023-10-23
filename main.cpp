@@ -44,8 +44,6 @@ int sa_sys_ram_total = 0;
 
 // Testnet
 
-// Int System
-
 // Char
 char *c_dgbn_api;
 char *cm_enabled;
