@@ -33,6 +33,8 @@ typedef struct DiskSpaceInfo
 
 // int
 int connection = 0;
+int rpc_main_con = 0;
+int rpc_test_con = 0;
 int sa_sys_cpu = 0;
 int sa_sys_rss = 0;
 int sa_sys_vsz = 0;
@@ -41,6 +43,11 @@ int sa_sys_ram_total = 0;
 
 // Char
 char *c_dgbn_api;
+char *cm_rpc_ip;
+char *cm_rpc_port;
+char *ct_rpc_ip;
+char *ct_rpc_port;
+char api_url[] = "https://digibytenode.com/api";
 
 volatile int run = 1;
 
@@ -115,29 +122,66 @@ DiskSpaceInfo getDiskSpaceInfo(const char *path)
 }
 // disk
 
-void *rpc(void *arg)
+void *menu(void *arg)
 {
-  // RPC thread
+  // menu thread
   while (run)
   {
     char c[256];
     time_t tim = time(NULL);
     struct tm *tmp = localtime(&tim);
     strftime(c, 256, "[%y-%m-%d %H:%M:%S]", tmp);
+    printf("\x1b[1;1H");
+    printf("\x1b[2J");
 
-    // app ram
-    sa_sys_rss = getmemrss();
-    // cpu use
-    sa_sys_cpu = getcpu();
-    // ram use
-    sa_sys_ram_used = getmemramuse();
-    // ram total
-    sa_sys_ram_total = getmemramtotal();
+    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.0.3.2");
+    printf("%-15s\n", "----------------------------------");
+    if (connection == 0)
+    {
+      printf("%-15s %-15s\n", "STATUS:", "DISCONNECTED");
+    }
+    else
+    {
+      printf("%-15s %-15s\n", "STATUS:", "CONNECTED");
+    }
+    printf("%-15s %s\n", "TIME:", c);
+    printf("%-15s %s\n", "API KEY:", c_dgbn_api);
+    printf("%-15s\n", "----------------------------------");
+    printf("%-15s\n", "MAINNET RPC");
+    if (rpc_main_con == 0)
+    {
+      printf("%-15s %-15s\n", "STATUS:", "DISCONNECTED");
+    }
+    else
+    {
+      printf("%-15s %-15s\n", "STATUS:", "CONNECTED");
+    }
+    printf("%-15s %s\n", "IP:", cm_rpc_ip);
+    printf("%-15s %s\n", "PORT:", cm_rpc_port);
+    printf("%-15s\n", "----------------------------------");
+    printf("%-15s\n", "TESTNET RPC");
+    if (rpc_test_con == 0)
+    {
+      printf("%-15s %-15s\n", "STATUS:", "DISCONNECTED");
+    }
+    else
+    {
+      printf("%-15s %-15s\n", "STATUS:", "CONNECTED");
+    }
+    printf("%-15s %s\n", "IP:", ct_rpc_ip);
+    printf("%-15s %s\n", "PORT:", ct_rpc_port);
+    printf("%-15s\n", "----------------------------------");
 
-    printf("\x1b[s");
-    printf("DIGIBYTENODE.COM CONNECT 1.0.2.8 %s\n", c);
-    printf("API KEY: %s\n", c_dgbn_api);
-    printf("\x1b[u");
+    sleep(1);
+  }
+  pthread_exit(NULL);
+}
+
+void *rpc(void *arg)
+{
+  // RPC thread
+  while (run)
+  {
 
     sleep(5);
   }
@@ -151,13 +195,22 @@ void *api_hardware(void *arg)
     // Hardware api thread
     char url[150];
 
+    // app ram
+    sa_sys_rss = getmemrss();
+    // cpu use
+    sa_sys_cpu = getcpu();
+    // ram use
+    sa_sys_ram_used = getmemramuse();
+    // ram total
+    sa_sys_ram_total = getmemramtotal();
+
     const char *path = "/";
     DiskSpaceInfo data = getDiskSpaceInfo(path);
     double used_space = bytesToGigabytes(data.used_space);
     double total_space = bytesToGigabytes(data.total_space);
     // double free_space = bytesToGigabytes(data.free_space);
 
-    sprintf(url, "https://digibytenode.com/api/hardware/?key=%s&cpu=%d&mem=%d&memt=%d&lds=%.2f&ldst=%.2f", c_dgbn_api, sa_sys_cpu, sa_sys_ram_used, sa_sys_ram_total, used_space, total_space);
+    sprintf(url, "%s/hardware/?key=%s&cpu=%d&mem=%d&memt=%d&lds=%.2f&ldst=%.2f", api_url, c_dgbn_api, sa_sys_cpu, sa_sys_ram_used, sa_sys_ram_total, used_space, total_space);
     std::string response = OpenURLWithVariable(url);
 
     sleep(5);
@@ -195,18 +248,34 @@ void stop_thread(int signo)
 int main()
 {
   INIReader reader("dgbn.ini");
-  // api
+  // api key
   std::string dgbn_api = reader.Get("hardware", "api", "");
   c_dgbn_api = strcpy(new char[dgbn_api.length() + 1], dgbn_api.c_str());
 
+  // mainnet ip
+  std::string m_rpc_ip = reader.Get("mainnet", "rpc_ip", "");
+  cm_rpc_ip = strcpy(new char[m_rpc_ip.length() + 1], m_rpc_ip.c_str());
+  // mainnet port
+  std::string m_rpc_port = reader.Get("mainnet", "rpc_port", "");
+  cm_rpc_port = strcpy(new char[m_rpc_port.length() + 1], m_rpc_port.c_str());
+
+  // testnet ip
+  std::string t_rpc_ip = reader.Get("testnet", "rpc_ip", "");
+  ct_rpc_ip = strcpy(new char[t_rpc_ip.length() + 1], t_rpc_ip.c_str());
+  // testnet port
+  std::string t_rpc_port = reader.Get("testnet", "rpc_port", "");
+  ct_rpc_port = strcpy(new char[t_rpc_port.length() + 1], t_rpc_port.c_str());
+
+  pthread_t ptid0;
   pthread_t ptid1;
   pthread_t ptid2;
   pthread_t ptid3;
   pthread_t ptid4;
+  pthread_create(&ptid0, NULL, menu, NULL);
   pthread_create(&ptid1, NULL, rpc, NULL);
   pthread_create(&ptid2, NULL, api_hardware, NULL);
   pthread_create(&ptid3, NULL, api_mainnet, NULL);
   pthread_create(&ptid4, NULL, api_testnet, NULL);
-  pthread_join(ptid1, NULL);
+  pthread_join(ptid0, NULL);
   return 0;
 }
