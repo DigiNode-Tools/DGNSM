@@ -242,19 +242,19 @@ inline int ini_parse(const char *filename, ini_handler handler, void *user)
 
 #endif
 
-#ifndef __INIREADER_H__
-#define __INIREADER_H__
+#ifndef __JJINI_H__
+#define __JJINI_H__
 
 #include <map>
 #include <set>
 #include <string>
 
-class INIReader
+class JJINI
 {
 public:
-    INIReader(){};
-    explicit INIReader(const std::string &filename);
-    explicit INIReader(FILE *file);
+    JJINI(){};
+    explicit JJINI(const std::string &filename);
+    explicit JJINI(FILE *file);
     int ParseError() const;
     const std::set<std::string> &Sections() const;
     std::string Get(const std::string &section, const std::string &name,
@@ -276,40 +276,40 @@ protected:
 
 #endif
 
-#ifndef __INIREADER__
-#define __INIREADER__
+#ifndef __JJINI__
+#define __JJINI__
 
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
 
-inline INIReader::INIReader(const std::string &filename)
+inline JJINI::JJINI(const std::string &filename)
 {
     _error = ini_parse(filename.c_str(), ValueHandler, this);
 }
 
-inline INIReader::INIReader(FILE *file)
+inline JJINI::JJINI(FILE *file)
 {
     _error = ini_parse_file(file, ValueHandler, this);
 }
 
-inline int INIReader::ParseError() const
+inline int JJINI::ParseError() const
 {
     return _error;
 }
 
-inline const std::set<std::string> &INIReader::Sections() const
+inline const std::set<std::string> &JJINI::Sections() const
 {
     return _sections;
 }
 
-inline std::string INIReader::Get(const std::string &section, const std::string &name, const std::string &default_value) const
+inline std::string JJINI::Get(const std::string &section, const std::string &name, const std::string &default_value) const
 {
     std::string key = MakeKey(section, name);
     return _values.count(key) ? _values.at(key) : default_value;
 }
 
-inline long INIReader::GetInteger(const std::string &section, const std::string &name, long default_value) const
+inline long JJINI::GetInteger(const std::string &section, const std::string &name, long default_value) const
 {
     std::string valstr = Get(section, name, "");
     const char *value = valstr.c_str();
@@ -318,7 +318,7 @@ inline long INIReader::GetInteger(const std::string &section, const std::string 
     return end > value ? n : default_value;
 }
 
-inline double INIReader::GetReal(const std::string &section, const std::string &name, double default_value) const
+inline double JJINI::GetReal(const std::string &section, const std::string &name, double default_value) const
 {
     std::string valstr = Get(section, name, "");
     const char *value = valstr.c_str();
@@ -327,7 +327,7 @@ inline double INIReader::GetReal(const std::string &section, const std::string &
     return end > value ? n : default_value;
 }
 
-inline float INIReader::GetFloat(const std::string &section, const std::string &name, float default_value) const
+inline float JJINI::GetFloat(const std::string &section, const std::string &name, float default_value) const
 {
     std::string valstr = Get(section, name, "");
     const char *value = valstr.c_str();
@@ -336,7 +336,7 @@ inline float INIReader::GetFloat(const std::string &section, const std::string &
     return end > value ? n : default_value;
 }
 
-inline bool INIReader::GetBoolean(const std::string &section, const std::string &name, bool default_value) const
+inline bool JJINI::GetBoolean(const std::string &section, const std::string &name, bool default_value) const
 {
     std::string valstr = Get(section, name, "");
     std::transform(valstr.begin(), valstr.end(), valstr.begin(), ::tolower);
@@ -348,17 +348,17 @@ inline bool INIReader::GetBoolean(const std::string &section, const std::string 
         return default_value;
 }
 
-inline std::string INIReader::MakeKey(const std::string &section, const std::string &name)
+inline std::string JJINI::MakeKey(const std::string &section, const std::string &name)
 {
     std::string key = section + "=" + name;
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     return key;
 }
 
-inline int INIReader::ValueHandler(void *user, const char *section, const char *name,
+inline int JJINI::ValueHandler(void *user, const char *section, const char *name,
                                    const char *value)
 {
-    INIReader *reader = (INIReader *)user;
+    JJINI *reader = (JJINI *)user;
     std::string key = MakeKey(section, name);
     if (reader->_values[key].size() > 0)
         reader->_values[key] += "\n";
