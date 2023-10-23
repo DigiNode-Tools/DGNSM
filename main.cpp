@@ -31,7 +31,7 @@ typedef struct DiskSpaceInfo
 } DiskSpaceInfo;
 // disk
 
-// int
+// Int System
 int connection = 0;
 int rpc_main_con = 0;
 int rpc_test_con = 0;
@@ -41,10 +41,18 @@ int sa_sys_vsz = 0;
 int sa_sys_ram_used = 0;
 int sa_sys_ram_total = 0;
 
+// Mainnet
+
+// Testnet
+
+// Int System
+
 // Char
 char *c_dgbn_api;
+char *cm_enabled;
 char *cm_rpc_ip;
 char *cm_rpc_port;
+char *ct_enabled;
 char *ct_rpc_ip;
 char *ct_rpc_port;
 char api_url[] = "https://digibytenode.com/api";
@@ -147,31 +155,36 @@ void *menu(void *arg)
     printf("%-15s %s\n", "TIME:", c);
     printf("%-15s %s\n", "API KEY:", c_dgbn_api);
     printf("%-15s\n", "----------------------------------");
-    printf("%-15s\n", "MAINNET RPC");
-    if (rpc_main_con == 0)
+    if (strcmp(cm_enabled, "true") == 0)
     {
-      printf("%-15s %-15s\n", "STATUS:", "DISCONNECTED");
+      printf("%-15s\n", "MAINNET RPC");
+      if (rpc_main_con == 0)
+      {
+        printf("%-15s %-15s\n", "STATUS:", "DISCONNECTED");
+      }
+      else
+      {
+        printf("%-15s %-15s\n", "STATUS:", "CONNECTED");
+      }
+      printf("%-15s %s\n", "IP:", cm_rpc_ip);
+      printf("%-15s %s\n", "PORT:", cm_rpc_port);
+      printf("%-15s\n", "----------------------------------");
     }
-    else
+    if (strcmp(ct_enabled, "true") == 0)
     {
-      printf("%-15s %-15s\n", "STATUS:", "CONNECTED");
+      printf("%-15s\n", "TESTNET RPC");
+      if (rpc_test_con == 0)
+      {
+        printf("%-15s %-15s\n", "STATUS:", "DISCONNECTED");
+      }
+      else
+      {
+        printf("%-15s %-15s\n", "STATUS:", "CONNECTED");
+      }
+      printf("%-15s %s\n", "IP:", ct_rpc_ip);
+      printf("%-15s %s\n", "PORT:", ct_rpc_port);
+      printf("%-15s\n", "----------------------------------");
     }
-    printf("%-15s %s\n", "IP:", cm_rpc_ip);
-    printf("%-15s %s\n", "PORT:", cm_rpc_port);
-    printf("%-15s\n", "----------------------------------");
-    printf("%-15s\n", "TESTNET RPC");
-    if (rpc_test_con == 0)
-    {
-      printf("%-15s %-15s\n", "STATUS:", "DISCONNECTED");
-    }
-    else
-    {
-      printf("%-15s %-15s\n", "STATUS:", "CONNECTED");
-    }
-    printf("%-15s %s\n", "IP:", ct_rpc_ip);
-    printf("%-15s %s\n", "PORT:", ct_rpc_port);
-    printf("%-15s\n", "----------------------------------");
-
     sleep(1);
   }
   pthread_exit(NULL);
@@ -251,20 +264,30 @@ int main()
   // api key
   std::string dgbn_api = reader.Get("hardware", "api", "");
   c_dgbn_api = strcpy(new char[dgbn_api.length() + 1], dgbn_api.c_str());
-
+  // mainnet enabled
+  std::string m_enabled = reader.Get("mainnet", "enabled", "");
+  cm_enabled = strcpy(new char[m_enabled.length() + 1], m_enabled.c_str());
   // mainnet ip
   std::string m_rpc_ip = reader.Get("mainnet", "rpc_ip", "");
   cm_rpc_ip = strcpy(new char[m_rpc_ip.length() + 1], m_rpc_ip.c_str());
   // mainnet port
   std::string m_rpc_port = reader.Get("mainnet", "rpc_port", "");
   cm_rpc_port = strcpy(new char[m_rpc_port.length() + 1], m_rpc_port.c_str());
-
+  // testnet enabled
+  std::string t_enabled = reader.Get("testnet", "enabled", "");
+  ct_enabled = strcpy(new char[t_enabled.length() + 1], t_enabled.c_str());
   // testnet ip
   std::string t_rpc_ip = reader.Get("testnet", "rpc_ip", "");
   ct_rpc_ip = strcpy(new char[t_rpc_ip.length() + 1], t_rpc_ip.c_str());
   // testnet port
   std::string t_rpc_port = reader.Get("testnet", "rpc_port", "");
   ct_rpc_port = strcpy(new char[t_rpc_port.length() + 1], t_rpc_port.c_str());
+
+  if (strcmp(c_dgbn_api, "") == 0)
+  {
+    printf("%-15s\n", "Error loading configuration file: dgbn.ini");
+    exit(0);
+  }
 
   pthread_t ptid0;
   pthread_t ptid1;
@@ -274,8 +297,14 @@ int main()
   pthread_create(&ptid0, NULL, menu, NULL);
   pthread_create(&ptid1, NULL, rpc, NULL);
   pthread_create(&ptid2, NULL, api_hardware, NULL);
-  pthread_create(&ptid3, NULL, api_mainnet, NULL);
-  pthread_create(&ptid4, NULL, api_testnet, NULL);
+  if (strcmp(cm_enabled, "true") == 0)
+  {
+    pthread_create(&ptid3, NULL, api_mainnet, NULL);
+  }
+  if (strcmp(ct_enabled, "true") == 0)
+  {
+    pthread_create(&ptid4, NULL, api_testnet, NULL);
+  }
   pthread_join(ptid0, NULL);
   return 0;
 }
