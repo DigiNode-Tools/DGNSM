@@ -2,7 +2,6 @@
 #include <iostream>
 #include <sstream>
 #include "jj_ini.h"
-// ini
 
 #include <stdio.h>
 #include <pthread.h>
