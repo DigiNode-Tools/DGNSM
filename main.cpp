@@ -1,4 +1,4 @@
-// ini
+// DNSU 1.0.4.0
 #include <iostream>
 #include <sstream>
 #include "jj_ini.h"
@@ -182,22 +182,22 @@ void *menu(void *arg)
     printf("\x1b[1;1H");
     printf("\x1b[2J");
 
-    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.0.3.6");
+    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.0.4.0");
     printf("%-15s\n", "----------------------------------");
     if (connection == 0)
     {
-      printf("%-15s %-15s\n", "STATUS:", "DISCONNECTED");
+      printf("%-15s %-15s\n", "API:", "DISCONNECTED");
     }
     else
     {
-      printf("%-15s %-15s\n", "STATUS:", "CONNECTED");
+      printf("%-15s %-15s\n", "API:", "CONNECTED");
     }
     printf("%-15s %s\n", "TIME:", c);
     printf("%-15s %s\n", "API KEY:", c_dgbn_api);
     printf("%-15s\n", "----------------------------------");
     if (strcmp(cm_enabled, "true") == 0)
     {
-      printf("%-15s\n", "MAINNET RPC");
+      printf("%-15s\n", "RPC: MAINNET");
       if (rpc_main_con == 0)
       {
         printf("%-15s %-15s\n", "STATUS:", "DISCONNECTED");
@@ -212,7 +212,7 @@ void *menu(void *arg)
     }
     if (strcmp(ct_enabled, "true") == 0)
     {
-      printf("%-15s\n", "TESTNET RPC");
+      printf("%-15s\n", "RPC: TESTNET");
       if (rpc_test_con == 0)
       {
         printf("%-15s %-15s\n", "STATUS:", "DISCONNECTED");
@@ -225,7 +225,7 @@ void *menu(void *arg)
       printf("%-15s %s\n", "PORT:", ct_rpc_port);
       printf("%-15s\n", "----------------------------------");
     }
-    sleep(5);
+    sleep(1);
   }
   pthread_exit(NULL);
 }
@@ -347,7 +347,17 @@ void *api_mainnet(void *arg)
         }
       }
     }
-
+    if (rpc_main_con == 1)
+    {
+      char url[150];
+      sprintf(url, "%s/main/?key=%s&version=%d&connections=%d&transactions=%d&blocks=%d&headers=%d&uptime=%d", api_url, c_dgbn_api, m_version, m_connections, m_transactions, m_blocks, m_headers, m_uptime);
+      std::string response = OpenURLWithVariable(url);
+      size_t found = response.find("ok");
+      if (found != std::string::npos)
+      {
+        connection = 1;
+      }
+    }
     sleep(10);
   }
   pthread_exit(NULL);
@@ -445,7 +455,17 @@ void *api_testnet(void *arg)
         }
       }
     }
-
+    if (rpc_test_con == 1)
+    {
+      char url[150];
+      sprintf(url, "%s/test/?key=%s&version=%d&connections=%d&transactions=%d&blocks=%d&headers=%d&uptime=%d", api_url, c_dgbn_api, t_version, t_connections, t_transactions, t_blocks, t_headers, t_uptime);
+      std::string response = OpenURLWithVariable(url);
+      size_t found = response.find("ok");
+      if (found != std::string::npos)
+      {
+        connection = 1;
+      }
+    }
     sleep(10);
   }
   pthread_exit(NULL);
@@ -489,7 +509,6 @@ int main()
   }
 
   pthread_t ptid0;
-  pthread_t ptid1;
   pthread_t ptid2;
   pthread_t ptid3;
   pthread_t ptid4;
