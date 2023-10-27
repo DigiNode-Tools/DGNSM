@@ -9,6 +9,10 @@
 #include <string.h>
 #include <string>
 #include <time.h>
+#include <vector>
+
+// json
+#include <json-c/json.h>
 
 // system
 #include <sys/resource.h>
@@ -32,8 +36,6 @@ typedef struct DiskSpaceInfo
 
 // Int System
 int connection = 0;
-int rpc_main_con = 0;
-int rpc_test_con = 0;
 int sa_sys_cpu = 0;
 int sa_sys_rss = 0;
 int sa_sys_vsz = 0;
@@ -41,17 +43,35 @@ int sa_sys_ram_used = 0;
 int sa_sys_ram_total = 0;
 
 // Mainnet
+int rpc_main_con = 0;
+int m_version = 0;
+int m_connections = 0;
+int m_transactions = 0;
+int m_blocks = 0;
+int m_headers = 0;
+int m_uptime = 0;
 
 // Testnet
+int rpc_test_con = 0;
+int t_version = 0;
+int t_connections = 0;
+int t_transactions = 0;
+int t_blocks = 0;
+int t_headers = 0;
+int t_uptime = 0;
 
 // Char
 char *c_dgbn_api;
 char *cm_enabled;
 char *cm_rpc_ip;
 char *cm_rpc_port;
+char *cm_rpc_user;
+char *cm_rpc_password;
 char *ct_enabled;
 char *ct_rpc_ip;
 char *ct_rpc_port;
+char *ct_rpc_user;
+char *ct_rpc_password;
 char api_url[] = "https://digibytenode.com/api";
 
 volatile int run = 1;
@@ -61,6 +81,30 @@ size_t WriteCallback(void *contents, size_t size, size_t nmemb, std::string *out
   size_t total_size = size * nmemb;
   output->append(static_cast<char *>(contents), total_size);
   return total_size;
+}
+
+std::string sendBitcoinRPCRequest(const char *url, const char *method)
+{
+  CURL *curl;
+  CURLcode res;
+  char *response_str = NULL;
+  curl = curl_easy_init();
+  std::string s;
+  struct json_object *request = json_object_new_object();
+  json_object_object_add(request, "jsonrpc", json_object_new_string("2.0"));
+  json_object_object_add(request, "id", json_object_new_int(1));
+  json_object_object_add(request, "method", json_object_new_string(method));
+  struct curl_slist *headers = NULL;
+  headers = curl_slist_append(headers, "Content-Type: application/json");
+  curl_easy_setopt(curl, CURLOPT_URL, url);
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(request));
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
+  res = curl_easy_perform(curl);
+  curl_slist_free_all(headers);
+  curl_easy_cleanup(curl);
+  json_object_put(request);
+  return s;
 }
 
 std::string OpenURLWithVariable(const std::string &url)
@@ -117,7 +161,6 @@ DiskSpaceInfo getDiskSpaceInfo(const char *path)
   }
   else
   {
-    // Handle error
     data.free_space = 0;
     data.total_space = 0;
     data.used_space = 0;
@@ -139,7 +182,7 @@ void *menu(void *arg)
     printf("\x1b[1;1H");
     printf("\x1b[2J");
 
-    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.0.3.2");
+    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.0.3.6");
     printf("%-15s\n", "----------------------------------");
     if (connection == 0)
     {
@@ -182,17 +225,6 @@ void *menu(void *arg)
       printf("%-15s %s\n", "PORT:", ct_rpc_port);
       printf("%-15s\n", "----------------------------------");
     }
-    sleep(1);
-  }
-  pthread_exit(NULL);
-}
-
-void *rpc(void *arg)
-{
-  // RPC thread
-  while (run)
-  {
-
     sleep(5);
   }
   pthread_exit(NULL);
@@ -204,14 +236,9 @@ void *api_hardware(void *arg)
   {
     // Hardware api thread
     char url[150];
-
-    // app ram
     sa_sys_rss = getmemrss();
-    // cpu use
     sa_sys_cpu = getcpu();
-    // ram use
     sa_sys_ram_used = getmemramuse();
-    // ram total
     sa_sys_ram_total = getmemramtotal();
 
     const char *path = "/";
@@ -232,7 +259,94 @@ void *api_mainnet(void *arg)
 {
   while (run)
   {
-    // Mainnet api thread
+    std::string sub_str;
+    char rpcUrl[200];
+    sprintf(rpcUrl, "http://%s:%s@%s:%s", cm_rpc_user, cm_rpc_password, cm_rpc_ip, cm_rpc_port);
+    std::string str1 = sendBitcoinRPCRequest(rpcUrl, "getmempoolinfo");
+    std::string str2 = sendBitcoinRPCRequest(rpcUrl, "getnetworkinfo");
+    std::string str3 = sendBitcoinRPCRequest(rpcUrl, "getblockchaininfo");
+    std::string result = str1 + str2 + str3;
+
+    std::string textToRemove = "size_";
+    size_t found = result.find(textToRemove);
+    while (found != std::string::npos)
+    {
+      result.erase(found, textToRemove.length());
+      found = result.find(textToRemove);
+    }
+
+    std::string textToRemove2 = "\"result\":{";
+    size_t found2 = result.find(textToRemove2);
+    while (found2 != std::string::npos)
+    {
+      result.erase(found2, textToRemove2.length());
+      found2 = result.find(textToRemove2);
+    }
+
+    char charToRemove = '{';
+    result.erase(std::remove_if(result.begin(), result.end(), [charToRemove](char c)
+                                { return c == charToRemove; }),
+                 result.end());
+    char charToRemove2 = '}';
+    result.erase(std::remove_if(result.begin(), result.end(), [charToRemove2](char c)
+                                { return c == charToRemove2; }),
+                 result.end());
+
+    std::vector<std::string> tokens;
+    std::stringstream ss(result);
+    std::string token;
+    while (std::getline(ss, token, ','))
+    {
+      tokens.push_back(token);
+    }
+    int u = 1;
+    for (const std::string &s : tokens)
+    {
+      size_t pos = s.find(':') + 1;
+      if (pos != std::string::npos)
+      {
+        sub_str = s.substr(pos);
+        if (s.find("block") == 1)
+        {
+          m_blocks = std::stoi(sub_str);
+          u = 2;
+        }
+        if (s.find("headers") == 1)
+        {
+          m_headers = std::stoi(sub_str);
+          u = 2;
+        }
+        if (s.find("protocolversion") == 1)
+        {
+          m_version = std::stoi(sub_str);
+          u = 2;
+        }
+        if (s.find("connections") == 1)
+        {
+          m_connections = std::stoi(sub_str);
+          u = 2;
+        }
+        if (s.find("mediantime") == 1)
+        {
+          m_uptime = std::stoi(sub_str);
+          u = 2;
+        }
+        if (s.find("size") == 1)
+        {
+          m_transactions = std::stoi(sub_str);
+          u = 2;
+        }
+
+        if (u == 2)
+        {
+          rpc_main_con = 1;
+        }
+        else
+        {
+          rpc_main_con = 0;
+        }
+      }
+    }
 
     sleep(10);
   }
@@ -243,7 +357,94 @@ void *api_testnet(void *arg)
 {
   while (run)
   {
-    // Testnet api thread
+    std::string sub_str;
+    char rpcUrl[200];
+    sprintf(rpcUrl, "http://%s:%s@%s:%s", ct_rpc_user, ct_rpc_password, ct_rpc_ip, ct_rpc_port);
+    std::string str1 = sendBitcoinRPCRequest(rpcUrl, "getmempoolinfo");
+    std::string str2 = sendBitcoinRPCRequest(rpcUrl, "getnetworkinfo");
+    std::string str3 = sendBitcoinRPCRequest(rpcUrl, "getblockchaininfo");
+    std::string result = str1 + str2 + str3;
+
+    std::string textToRemove = "size_";
+    size_t found = result.find(textToRemove);
+    while (found != std::string::npos)
+    {
+      result.erase(found, textToRemove.length());
+      found = result.find(textToRemove);
+    }
+
+    std::string textToRemove2 = "\"result\":{";
+    size_t found2 = result.find(textToRemove2);
+    while (found2 != std::string::npos)
+    {
+      result.erase(found2, textToRemove2.length());
+      found2 = result.find(textToRemove2);
+    }
+
+    char charToRemove = '{';
+    result.erase(std::remove_if(result.begin(), result.end(), [charToRemove](char c)
+                                { return c == charToRemove; }),
+                 result.end());
+    char charToRemove2 = '}';
+    result.erase(std::remove_if(result.begin(), result.end(), [charToRemove2](char c)
+                                { return c == charToRemove2; }),
+                 result.end());
+
+    std::vector<std::string> tokens;
+    std::stringstream ss(result);
+    std::string token;
+    while (std::getline(ss, token, ','))
+    {
+      tokens.push_back(token);
+    }
+    int u = 1;
+    for (const std::string &s : tokens)
+    {
+      size_t pos = s.find(':') + 1;
+      if (pos != std::string::npos)
+      {
+        sub_str = s.substr(pos);
+        if (s.find("block") == 1)
+        {
+          t_blocks = std::stoi(sub_str);
+          u = 2;
+        }
+        if (s.find("headers") == 1)
+        {
+          t_headers = std::stoi(sub_str);
+          u = 2;
+        }
+        if (s.find("protocolversion") == 1)
+        {
+          t_version = std::stoi(sub_str);
+          u = 2;
+        }
+        if (s.find("connections") == 1)
+        {
+          t_connections = std::stoi(sub_str);
+          u = 2;
+        }
+        if (s.find("mediantime") == 1)
+        {
+          t_uptime = std::stoi(sub_str);
+          u = 2;
+        }
+        if (s.find("size") == 1)
+        {
+          t_transactions = std::stoi(sub_str);
+          u = 2;
+        }
+
+        if (u == 2)
+        {
+          rpc_test_con = 1;
+        }
+        else
+        {
+          rpc_test_con = 0;
+        }
+      }
+    }
 
     sleep(10);
   }
@@ -258,27 +459,28 @@ void stop_thread(int signo)
 int main()
 {
   JJINI reader("dgbn.ini");
-  // api key
   std::string dgbn_api = reader.Get("hardware", "api", "");
   c_dgbn_api = strcpy(new char[dgbn_api.length() + 1], dgbn_api.c_str());
-  // mainnet enabled
   std::string m_enabled = reader.Get("mainnet", "enabled", "");
   cm_enabled = strcpy(new char[m_enabled.length() + 1], m_enabled.c_str());
-  // mainnet ip
   std::string m_rpc_ip = reader.Get("mainnet", "rpc_ip", "");
   cm_rpc_ip = strcpy(new char[m_rpc_ip.length() + 1], m_rpc_ip.c_str());
-  // mainnet port
   std::string m_rpc_port = reader.Get("mainnet", "rpc_port", "");
   cm_rpc_port = strcpy(new char[m_rpc_port.length() + 1], m_rpc_port.c_str());
-  // testnet enabled
+  std::string m_rpc_user = reader.Get("mainnet", "rpc_user", "");
+  cm_rpc_user = strcpy(new char[m_rpc_user.length() + 1], m_rpc_user.c_str());
+  std::string m_rpc_password = reader.Get("mainnet", "rpc_password", "");
+  cm_rpc_password = strcpy(new char[m_rpc_password.length() + 1], m_rpc_password.c_str());
   std::string t_enabled = reader.Get("testnet", "enabled", "");
   ct_enabled = strcpy(new char[t_enabled.length() + 1], t_enabled.c_str());
-  // testnet ip
   std::string t_rpc_ip = reader.Get("testnet", "rpc_ip", "");
   ct_rpc_ip = strcpy(new char[t_rpc_ip.length() + 1], t_rpc_ip.c_str());
-  // testnet port
   std::string t_rpc_port = reader.Get("testnet", "rpc_port", "");
   ct_rpc_port = strcpy(new char[t_rpc_port.length() + 1], t_rpc_port.c_str());
+  std::string t_rpc_user = reader.Get("testnet", "rpc_user", "");
+  ct_rpc_user = strcpy(new char[t_rpc_user.length() + 1], t_rpc_user.c_str());
+  std::string t_rpc_password = reader.Get("testnet", "rpc_password", "");
+  ct_rpc_password = strcpy(new char[t_rpc_password.length() + 1], t_rpc_password.c_str());
 
   if (strcmp(c_dgbn_api, "") == 0)
   {
@@ -292,7 +494,6 @@ int main()
   pthread_t ptid3;
   pthread_t ptid4;
   pthread_create(&ptid0, NULL, menu, NULL);
-  pthread_create(&ptid1, NULL, rpc, NULL);
   pthread_create(&ptid2, NULL, api_hardware, NULL);
   if (strcmp(cm_enabled, "true") == 0)
   {
