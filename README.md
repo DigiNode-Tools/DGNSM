@@ -1,6 +1,5 @@
-<b>DNSU ( DigiByte Node Status Updater )</b> DigiByteNode.COM
+<b>DNSU ( DigiByte Node Status Updater )</b> [Digibytenode.com](https://Digibytenode.com)
 
-[Digibytenode.com](https://Digibytenode.com)
 ![digibytenode8](https://github.com/Jongjan88/DNSU/assets/125610144/c94a44fb-86ef-49e3-a24c-72c706fa655c)
 
 DNSU
