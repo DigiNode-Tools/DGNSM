@@ -1,4 +1,4 @@
-// DNSU 1.0.4.2
+// DNSU 1.0.4.4
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -178,7 +178,7 @@ void *menu(void *arg)
     printf("\x1b[1;1H");
     printf("\x1b[2J");
 
-    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.0.4.2");
+    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.0.4.4");
     printf("%-15s\n", "----------------------------------");
     if (connection == 0)
     {
@@ -320,37 +320,52 @@ void *api_mainnet(void *arg)
     {
       size_t pos = s.find(':') + 1;
 
-      if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
-      {
-        outputFile << s << std::endl;
-      }
-
       if (pos != std::string::npos)
       {
 
         sub_str = s.substr(pos);
         if (s.find("block") == 1)
         {
+          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          {
+            outputFile << "\"block\":" << sub_str << std::endl;
+          }
           m_blocks = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("headers") == 1)
         {
+          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          {
+            outputFile << "\"headers\":" << sub_str << std::endl;
+          }
           m_headers = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("protocolversion") == 1)
         {
+          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          {
+            outputFile << "\"protocolversion\":" << sub_str << std::endl;
+          }
           m_version = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("connections") == 1)
         {
+          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          {
+            outputFile << "\"connections\":" << sub_str << std::endl;
+          }
           m_connections = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("size") == 1)
         {
+          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          {
+            outputFile << "\"transactions\":" << sub_str << std::endl;
+          }
           m_transactions = std::stoi(sub_str);
           u = 2;
         }
@@ -459,35 +474,51 @@ void *api_testnet(void *arg)
     for (const std::string &s : tokens)
     {
       size_t pos = s.find(':') + 1;
-      if (outputFile.is_open() && strcmp(ct_output, "true") == 0)
-      {
-        outputFile << s << std::endl;
-      }
       if (pos != std::string::npos)
       {
         sub_str = s.substr(pos);
         if (s.find("block") == 1)
         {
+          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          {
+            outputFile << "\"block\":" << sub_str << std::endl;
+          }
           t_blocks = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("headers") == 1)
         {
+          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          {
+            outputFile << "\"headers\":" << sub_str << std::endl;
+          }
           t_headers = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("protocolversion") == 1)
         {
+          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          {
+            outputFile << "\"protocolversion\":" << sub_str << std::endl;
+          }
           t_version = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("connections") == 1)
         {
+          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          {
+            outputFile << "\"connections\":" << sub_str << std::endl;
+          }
           t_connections = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("size") == 1)
         {
+          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          {
+            outputFile << "\"transactions\":" << sub_str << std::endl;
+          }
           t_transactions = std::stoi(sub_str);
           u = 2;
         }
