@@ -42,6 +42,7 @@ int m_transactions = 0;
 int m_blocks = 0;
 int m_headers = 0;
 int m_uptime = 0;
+int m_set_uptime = 0;
 
 // Testnet
 int rpc_test_con = 0;
@@ -51,6 +52,7 @@ int t_transactions = 0;
 int t_blocks = 0;
 int t_headers = 0;
 int t_uptime = 0;
+int t_set_uptime = 0;
 
 // Char
 char *c_dgbn_api;
@@ -176,7 +178,7 @@ void *menu(void *arg)
     printf("\x1b[1;1H");
     printf("\x1b[2J");
 
-    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.0.4.0");
+    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.0.4.2");
     printf("%-15s\n", "----------------------------------");
     if (connection == 0)
     {
@@ -311,6 +313,7 @@ void *api_mainnet(void *arg)
       outputFile << "\"ram_total\":" << sa_sys_ram_total << std::endl;
       outputFile << "\"disk_used\":" << used_space << std::endl;
       outputFile << "\"disk_total\":" << total_space << std::endl;
+      outputFile << "\"uptime\":" << m_uptime << std::endl;
     }
 
     for (const std::string &s : tokens)
@@ -346,11 +349,6 @@ void *api_mainnet(void *arg)
           m_connections = std::stoi(sub_str);
           u = 2;
         }
-        if (s.find("mediantime") == 1)
-        {
-          m_uptime = std::stoi(sub_str);
-          u = 2;
-        }
         if (s.find("size") == 1)
         {
           m_transactions = std::stoi(sub_str);
@@ -373,6 +371,12 @@ void *api_mainnet(void *arg)
     }
     if (rpc_main_con == 1)
     {
+      if (m_set_uptime == 0)
+      {
+        time_t unixTime;
+        m_uptime = time(NULL);
+        m_set_uptime = 1;
+      }
       char url[150];
       sprintf(url, "%s/main/?key=%s&version=%d&connections=%d&transactions=%d&blocks=%d&headers=%d&uptime=%d", api_url, c_dgbn_api, m_version, m_connections, m_transactions, m_blocks, m_headers, m_uptime);
       std::string response = OpenURLWithVariable(url);
@@ -440,12 +444,12 @@ void *api_testnet(void *arg)
     if (outputFile.is_open() && strcmp(ct_output, "true") == 0)
     {
       outputFile << "\"DNSU\":1000" << std::endl;
-      outputFile << "\"DNSU\":1" << std::endl;
       outputFile << "\"cpu\":" << sa_sys_cpu << std::endl;
       outputFile << "\"ram_used\":" << sa_sys_ram_used << std::endl;
       outputFile << "\"ram_total\":" << sa_sys_ram_total << std::endl;
       outputFile << "\"disk_used\":" << used_space << std::endl;
       outputFile << "\"disk_total\":" << total_space << std::endl;
+      outputFile << "\"uptime\":" << t_uptime << std::endl;
     }
     while (std::getline(ss, token, ','))
     {
@@ -482,11 +486,6 @@ void *api_testnet(void *arg)
           t_connections = std::stoi(sub_str);
           u = 2;
         }
-        if (s.find("mediantime") == 1)
-        {
-          t_uptime = std::stoi(sub_str);
-          u = 2;
-        }
         if (s.find("size") == 1)
         {
           t_transactions = std::stoi(sub_str);
@@ -509,6 +508,12 @@ void *api_testnet(void *arg)
     }
     if (rpc_test_con == 1)
     {
+      if (t_set_uptime == 0)
+      {
+        time_t unixTime;
+        t_uptime = time(NULL);
+        t_set_uptime = 1;
+      }
       char url[150];
       sprintf(url, "%s/test/?key=%s&version=%d&connections=%d&transactions=%d&blocks=%d&headers=%d&uptime=%d", api_url, c_dgbn_api, t_version, t_connections, t_transactions, t_blocks, t_headers, t_uptime);
       std::string response = OpenURLWithVariable(url);
