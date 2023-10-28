@@ -1,8 +1,8 @@
 // DNSU 1.0.4.0
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include "jj_ini.h"
-
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>
@@ -10,20 +10,12 @@
 #include <string>
 #include <time.h>
 #include <vector>
-
-// json
 #include <json-c/json.h>
-
-// system
 #include <sys/resource.h>
 #include <sys/time.h>
 #include "jj_system.h"
 #include <sys/statvfs.h>
-
-// curl
 #include <curl/curl.h>
-
-// disk
 #include <stdlib.h>
 #include <sys/statvfs.h>
 typedef struct DiskSpaceInfo
@@ -67,11 +59,13 @@ char *cm_rpc_ip;
 char *cm_rpc_port;
 char *cm_rpc_user;
 char *cm_rpc_password;
+char *cm_output;
 char *ct_enabled;
 char *ct_rpc_ip;
 char *ct_rpc_port;
 char *ct_rpc_user;
 char *ct_rpc_password;
+char *ct_output;
 char api_url[] = "https://digibytenode.com/api";
 
 volatile int run = 1;
@@ -300,11 +294,37 @@ void *api_mainnet(void *arg)
       tokens.push_back(token);
     }
     int u = 1;
+    std::ofstream outputFile;
+    if (strcmp(cm_output, "true") == 0)
+    {
+      outputFile.open("output.mainnet");
+    }
+    const char *path = "/";
+    DiskSpaceInfo data = getDiskSpaceInfo(path);
+    double used_space = bytesToGigabytes(data.used_space);
+    double total_space = bytesToGigabytes(data.total_space);
+    if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+    {
+      outputFile << "\"DNSU\":1000" << std::endl;
+      outputFile << "\"cpu\":" << sa_sys_cpu << std::endl;
+      outputFile << "\"ram_used\":" << sa_sys_ram_used << std::endl;
+      outputFile << "\"ram_total\":" << sa_sys_ram_total << std::endl;
+      outputFile << "\"disk_used\":" << used_space << std::endl;
+      outputFile << "\"disk_total\":" << total_space << std::endl;
+    }
+
     for (const std::string &s : tokens)
     {
       size_t pos = s.find(':') + 1;
+
+      if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+      {
+        outputFile << s << std::endl;
+      }
+
       if (pos != std::string::npos)
       {
+
         sub_str = s.substr(pos);
         if (s.find("block") == 1)
         {
@@ -346,6 +366,10 @@ void *api_mainnet(void *arg)
           rpc_main_con = 0;
         }
       }
+    }
+    if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+    {
+      outputFile.close();
     }
     if (rpc_main_con == 1)
     {
@@ -403,6 +427,26 @@ void *api_testnet(void *arg)
     std::vector<std::string> tokens;
     std::stringstream ss(result);
     std::string token;
+    std::ofstream outputFile;
+    if (strcmp(ct_output, "true") == 0)
+    {
+      outputFile.open("output.testnet");
+    }
+    const char *path = "/";
+    DiskSpaceInfo data = getDiskSpaceInfo(path);
+    double used_space = bytesToGigabytes(data.used_space);
+    double total_space = bytesToGigabytes(data.total_space);
+
+    if (outputFile.is_open() && strcmp(ct_output, "true") == 0)
+    {
+      outputFile << "\"DNSU\":1000" << std::endl;
+      outputFile << "\"DNSU\":1" << std::endl;
+      outputFile << "\"cpu\":" << sa_sys_cpu << std::endl;
+      outputFile << "\"ram_used\":" << sa_sys_ram_used << std::endl;
+      outputFile << "\"ram_total\":" << sa_sys_ram_total << std::endl;
+      outputFile << "\"disk_used\":" << used_space << std::endl;
+      outputFile << "\"disk_total\":" << total_space << std::endl;
+    }
     while (std::getline(ss, token, ','))
     {
       tokens.push_back(token);
@@ -411,6 +455,10 @@ void *api_testnet(void *arg)
     for (const std::string &s : tokens)
     {
       size_t pos = s.find(':') + 1;
+      if (outputFile.is_open() && strcmp(ct_output, "true") == 0)
+      {
+        outputFile << s << std::endl;
+      }
       if (pos != std::string::npos)
       {
         sub_str = s.substr(pos);
@@ -455,6 +503,10 @@ void *api_testnet(void *arg)
         }
       }
     }
+    if (outputFile.is_open() && strcmp(ct_output, "true") == 0)
+    {
+      outputFile.close();
+    }
     if (rpc_test_con == 1)
     {
       char url[150];
@@ -491,6 +543,8 @@ int main()
   cm_rpc_user = strcpy(new char[m_rpc_user.length() + 1], m_rpc_user.c_str());
   std::string m_rpc_password = reader.Get("mainnet", "rpc_password", "");
   cm_rpc_password = strcpy(new char[m_rpc_password.length() + 1], m_rpc_password.c_str());
+  std::string m_output = reader.Get("mainnet", "txtoutput", "");
+  cm_output = strcpy(new char[m_output.length() + 1], m_output.c_str());
   std::string t_enabled = reader.Get("testnet", "enabled", "");
   ct_enabled = strcpy(new char[t_enabled.length() + 1], t_enabled.c_str());
   std::string t_rpc_ip = reader.Get("testnet", "rpc_ip", "");
@@ -501,6 +555,8 @@ int main()
   ct_rpc_user = strcpy(new char[t_rpc_user.length() + 1], t_rpc_user.c_str());
   std::string t_rpc_password = reader.Get("testnet", "rpc_password", "");
   ct_rpc_password = strcpy(new char[t_rpc_password.length() + 1], t_rpc_password.c_str());
+  std::string t_output = reader.Get("testnet", "txtoutput", "");
+  ct_output = strcpy(new char[t_output.length() + 1], t_output.c_str());
 
   if (strcmp(c_dgbn_api, "") == 0)
   {
