@@ -1,6 +1,6 @@
 <b>DNSU ( DigiByte Node Status Updater )</b> DigiByteNode.COM
 
-![github4](https://github.com/Jongjan88/DNSU/assets/125610144/59020441-6e7b-46e2-a747-03fba8005074)
+![digibytenode6](https://github.com/Jongjan88/DNSU/assets/125610144/233beb53-2c3e-45b8-8d2d-cbc8a610e355)
 
 
 Debian / Ubuntu
