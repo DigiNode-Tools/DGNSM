@@ -1,4 +1,4 @@
-// DNSU 1.0.4.4
+// DNSU 1.4.5
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -18,6 +18,7 @@
 #include <curl/curl.h>
 #include <stdlib.h>
 #include <sys/statvfs.h>
+#include <cstdlib>
 typedef struct DiskSpaceInfo
 {
   unsigned long long total_space;
@@ -178,7 +179,7 @@ void *menu(void *arg)
     printf("\x1b[1;1H");
     printf("\x1b[2J");
 
-    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.0.4.4");
+    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.4.5");
     printf("%-15s\n", "----------------------------------");
     if (connection == 0)
     {
@@ -566,7 +567,27 @@ void stop_thread(int signo)
 
 int main()
 {
-  JJINI reader("dgbn.ini");
+  const char *homeDir = getenv("HOME");
+  std::string sfilePath = std::string(homeDir) + "/.digibyte/dgbn.ini";
+  std::ifstream ini(sfilePath);
+  std::ifstream ini2("dgbn.ini");
+  std::string filePath;
+  if (ini.is_open())
+  {
+    filePath = sfilePath;
+    ini.close();
+  }
+  if (ini2.is_open())
+  {
+    filePath = "dgbn.ini";
+    ini2.close();
+  }
+  if (filePath == "")
+  {
+    printf("%-15s\n", "Error loading configuration file: dgbn.ini");
+    exit(0);
+  }
+  JJINI reader(filePath);
   std::string dgbn_api = reader.Get("hardware", "api", "");
   c_dgbn_api = strcpy(new char[dgbn_api.length() + 1], dgbn_api.c_str());
   std::string m_enabled = reader.Get("mainnet", "enabled", "");
@@ -596,7 +617,7 @@ int main()
 
   if (strcmp(c_dgbn_api, "") == 0)
   {
-    printf("%-15s\n", "Error loading configuration file: dgbn.ini");
+    printf("%-15s\n", "Error loading api key! dgbn.ini");
     exit(0);
   }
 
