@@ -1,4 +1,4 @@
-// DNSU 1.4.5
+// DNSU 1.4.6
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -179,7 +179,7 @@ void *menu(void *arg)
     printf("\x1b[1;1H");
     printf("\x1b[2J");
 
-    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.4.5");
+    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.4.6");
     printf("%-15s\n", "----------------------------------");
     if (connection == 0)
     {
@@ -568,9 +568,9 @@ void stop_thread(int signo)
 int main()
 {
   const char *homeDir = getenv("HOME");
-  std::string sfilePath = std::string(homeDir) + "/.digibyte/dgbn.config";
+  std::string sfilePath = std::string(homeDir) + "/.digibyte/dnsu.config";
   std::ifstream config(sfilePath);
-  std::ifstream config2("dgbn.config");
+  std::ifstream config2("dnsu.config");
   std::string filePath;
   if (config.is_open())
   {
@@ -579,12 +579,12 @@ int main()
   }
   if (config2.is_open())
   {
-    filePath = "dgbn.config";
+    filePath = "dnsu.config";
     config2.close();
   }
   if (filePath == "")
   {
-    printf("%-15s\n", "Error loading configuration file: dgbn.config");
+    printf("%-15s\n", "Error loading configuration file: dnsu.config");
     exit(0);
   }
   JJINI reader(filePath);
@@ -617,7 +617,7 @@ int main()
 
   if (strcmp(c_dgbn_api, "") == 0)
   {
-    printf("%-15s\n", "Error loading api key! dgbn.config");
+    printf("%-15s\n", "Error loading api key! dnsu.config");
     exit(0);
   }
 
