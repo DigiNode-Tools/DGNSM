@@ -590,29 +590,89 @@ int main()
   JJINI reader(filePath);
   std::string dgbn_api = reader.Get("hardware", "api", "");
   c_dgbn_api = strcpy(new char[dgbn_api.length() + 1], dgbn_api.c_str());
+
   std::string m_enabled = reader.Get("mainnet", "enabled", "");
+  if (m_enabled == "")
+  {
+    m_enabled = reader.Get("mainnet", "m_enabled", "");
+  }
   cm_enabled = strcpy(new char[m_enabled.length() + 1], m_enabled.c_str());
+
   std::string m_rpc_ip = reader.Get("mainnet", "rpc_ip", "");
+  if (m_rpc_ip == "")
+  {
+    m_rpc_ip = reader.Get("mainnet", "m_rpc_ip", "");
+  }
   cm_rpc_ip = strcpy(new char[m_rpc_ip.length() + 1], m_rpc_ip.c_str());
+
   std::string m_rpc_port = reader.Get("mainnet", "rpc_port", "");
+  if (m_rpc_port == "")
+  {
+    m_rpc_port = reader.Get("mainnet", "m_rpc_port", "");
+  }
   cm_rpc_port = strcpy(new char[m_rpc_port.length() + 1], m_rpc_port.c_str());
+
   std::string m_rpc_user = reader.Get("mainnet", "rpc_user", "");
+  if (m_rpc_user == "")
+  {
+    m_rpc_user = reader.Get("mainnet", "m_rpc_user", "");
+  }
   cm_rpc_user = strcpy(new char[m_rpc_user.length() + 1], m_rpc_user.c_str());
+
   std::string m_rpc_password = reader.Get("mainnet", "rpc_password", "");
+  if (m_rpc_password == "")
+  {
+    m_rpc_password = reader.Get("mainnet", "m_rpc_password", "");
+  }
   cm_rpc_password = strcpy(new char[m_rpc_password.length() + 1], m_rpc_password.c_str());
+
   std::string m_output = reader.Get("mainnet", "txtoutput", "");
+  if (m_output == "")
+  {
+    m_output = reader.Get("mainnet", "m_txtoutput", "");
+  }
   cm_output = strcpy(new char[m_output.length() + 1], m_output.c_str());
+
   std::string t_enabled = reader.Get("testnet", "enabled", "");
+  if (t_enabled == "")
+  {
+    t_enabled = reader.Get("mainnet", "t_enabled", "");
+  }
   ct_enabled = strcpy(new char[t_enabled.length() + 1], t_enabled.c_str());
+
   std::string t_rpc_ip = reader.Get("testnet", "rpc_ip", "");
+  if (t_rpc_ip == "")
+  {
+    t_rpc_ip = reader.Get("mainnet", "t_rpc_ip", "");
+  }
   ct_rpc_ip = strcpy(new char[t_rpc_ip.length() + 1], t_rpc_ip.c_str());
+
   std::string t_rpc_port = reader.Get("testnet", "rpc_port", "");
+  if (t_rpc_port == "")
+  {
+    t_rpc_port = reader.Get("mainnet", "t_rpc_port", "");
+  }
   ct_rpc_port = strcpy(new char[t_rpc_port.length() + 1], t_rpc_port.c_str());
+
   std::string t_rpc_user = reader.Get("testnet", "rpc_user", "");
+  if (t_rpc_user == "")
+  {
+    t_rpc_user = reader.Get("mainnet", "t_rpc_user", "");
+  }
   ct_rpc_user = strcpy(new char[t_rpc_user.length() + 1], t_rpc_user.c_str());
+
   std::string t_rpc_password = reader.Get("testnet", "rpc_password", "");
+  if (t_rpc_password == "")
+  {
+    t_rpc_password = reader.Get("mainnet", "t_rpc_password", "");
+  }
   ct_rpc_password = strcpy(new char[t_rpc_password.length() + 1], t_rpc_password.c_str());
+
   std::string t_output = reader.Get("testnet", "txtoutput", "");
+  if (t_output == "")
+  {
+    t_output = reader.Get("mainnet", "t_txtoutput", "");
+  }
   ct_output = strcpy(new char[t_output.length() + 1], t_output.c_str());
 
   if (strcmp(c_dgbn_api, "") == 0)
@@ -620,7 +680,7 @@ int main()
     printf("%-15s\n", "Error loading api key! dnsu.config");
     exit(0);
   }
-
+  
   pthread_t ptid0;
   pthread_t ptid2;
   pthread_t ptid3;
