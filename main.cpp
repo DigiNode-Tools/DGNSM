@@ -309,6 +309,7 @@ void *api_mainnet(void *arg)
     if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
     {
       outputFile << "\"DNSU\":1000" << std::endl;
+      outputFile << "\"status\":" << rpc_main_con << std::endl;
       outputFile << "\"cpu\":" << sa_sys_cpu << std::endl;
       outputFile << "\"ram_used\":" << sa_sys_ram_used << std::endl;
       outputFile << "\"ram_total\":" << sa_sys_ram_total << std::endl;
@@ -460,6 +461,7 @@ void *api_testnet(void *arg)
     if (outputFile.is_open() && strcmp(ct_output, "true") == 0)
     {
       outputFile << "\"DNSU\":1000" << std::endl;
+      outputFile << "\"status\":" << rpc_test_con << std::endl;
       outputFile << "\"cpu\":" << sa_sys_cpu << std::endl;
       outputFile << "\"ram_used\":" << sa_sys_ram_used << std::endl;
       outputFile << "\"ram_total\":" << sa_sys_ram_total << std::endl;
