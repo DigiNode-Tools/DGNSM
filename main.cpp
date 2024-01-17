@@ -628,10 +628,10 @@ int main()
   }
   cm_rpc_password = strcpy(new char[m_rpc_password.length() + 1], m_rpc_password.c_str());
 
-  std::string m_output = reader.Get("mainnet", "txtoutput", "");
+  std::string m_output = reader.Get("mainnet", "json_dump", "");
   if (m_output == "")
   {
-    m_output = reader.Get("mainnet", "m_txtoutput", "");
+    m_output = reader.Get("mainnet", "m_json_dump", "");
   }
   cm_output = strcpy(new char[m_output.length() + 1], m_output.c_str());
 
@@ -670,10 +670,10 @@ int main()
   }
   ct_rpc_password = strcpy(new char[t_rpc_password.length() + 1], t_rpc_password.c_str());
 
-  std::string t_output = reader.Get("testnet", "txtoutput", "");
+  std::string t_output = reader.Get("testnet", "json_dump", "");
   if (t_output == "")
   {
-    t_output = reader.Get("mainnet", "t_txtoutput", "");
+    t_output = reader.Get("mainnet", "t_json_dump", "");
   }
   ct_output = strcpy(new char[t_output.length() + 1], t_output.c_str());
 
