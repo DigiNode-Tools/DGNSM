@@ -7,7 +7,7 @@ rpc_ip= 127.0.0.1
 rpc_port= 14022
 rpc_user=user
 rpc_password=pass
-txtoutput=false
+json_dump=false
 
 [testnet]
 enabled= true
@@ -15,4 +15,4 @@ rpc_ip= 127.0.0.1
 rpc_port= 14023
 rpc_user=user
 rpc_password=pass
-txtoutput=false
+json_dump=false
