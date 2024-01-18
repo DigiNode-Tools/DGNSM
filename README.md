@@ -14,7 +14,7 @@ DNSU
 
 > cd DNSU
 
-> make -f Makefile.linux
+> make
 
 > mv dnsu.config.template dnsu.config
 
