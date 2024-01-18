@@ -7,14 +7,18 @@ DNSU
 
 
 Debian / Ubuntu
-> apt install build-essential git nano libcurl4-openssl-dev libjson-c-dev -y
+> sudo apt install build-essential git nano libcurl4-openssl-dev libjson-c-dev -y
 
 > git clone https://github.com/Jongjan88/DNSU/
 
-> Make
+> cd DNSU
 
-> nano dgbn.ini
+> make
 
-( Get free api key on digibytenode.com )
+> mv dnsu.config.template dnsu.config
+
+[ Get free api key on digibytenode.com ]
+
+> nano dnsu.config
  
 > ./DNSU
