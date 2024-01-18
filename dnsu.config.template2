@@ -1,18 +1,18 @@
 [hardware]                              ; Hardware
-api= tba8HH7QD742                       ; API key digibytenode.com
+api=tba8HH7QD742                        ; API key digibytenode.com
 
 [mainnet]
-m_enabled= true
-m_rpc_ip= 127.0.0.1
-m_rpc_port= 14022
+m_enabled=true
+m_rpc_ip=127.0.0.1
+m_rpc_port=14022
 m_rpc_user=user
 m_rpc_password=pass
 m_json_dump=false
 
 [testnet]
-t_enabled= true
-t_rpc_ip= 127.0.0.1
-t_rpc_port= 14023
+t_enabled=true
+t_rpc_ip=127.0.0.1
+t_rpc_port=14023
 t_rpc_user=user
 t_rpc_password=pass
 t_json_dump=false
