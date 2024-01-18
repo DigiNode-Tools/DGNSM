@@ -10,9 +10,9 @@ DNSU
 
 > sudo apt install build-essential git nano libcurl4-openssl-dev libjson-c-dev -y
 
-> git clone https://github.com/Jongjan88/DNSU/
+> git clone https://github.com/Jongjan88/dnsu/
 
-> cd DNSU
+> cd dnsu
 
 > make
 
@@ -22,4 +22,4 @@ DNSU
 
 > nano dnsu.config
  
-> ./DNSU
+> ./dnsu
