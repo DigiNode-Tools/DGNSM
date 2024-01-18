@@ -2,17 +2,17 @@
 api= tba8HH7QD742                       ; API key digibytenode.com
 
 [mainnet]
-enabled= true
-rpc_ip= 127.0.0.1
-rpc_port= 14022
+enabled=true
+rpc_ip=127.0.0.1
+rpc_port=14022
 rpc_user=user
 rpc_password=pass
 json_dump=false
 
 [testnet]
-enabled= true
-rpc_ip= 127.0.0.1
-rpc_port= 14023
+enabled=true
+rpc_ip=127.0.0.1
+rpc_port=14023
 rpc_user=user
 rpc_password=pass
 json_dump=false
