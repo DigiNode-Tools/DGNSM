@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = -std=c++20 -Wall
 LDFLAGS = -lcurl -ljson-c
 
-DNSU:  main.o
+dnsu:  main.o
 	$(CXX) $(CXXFLAGS) -o DNSU main.o $(LDFLAGS)
 
 %.o: %.cpp *.h
