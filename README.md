@@ -6,7 +6,8 @@ DNSU
 ![DNSU](https://github.com/Jongjan88/DNSU/assets/125610144/c7b68bd0-bb6c-43c4-badd-62de66b6a330)
 
 
-Debian / Ubuntu
+<b>Debian / Ubuntu / ARM</b>
+
 > sudo apt install build-essential git nano libcurl4-openssl-dev libjson-c-dev -y
 
 > git clone https://github.com/Jongjan88/DNSU/
