@@ -1,4 +1,4 @@
-// DNSU 1.4.6
+// DNSU 1.4.8
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -179,7 +179,7 @@ void *menu(void *arg)
     printf("\x1b[1;1H");
     printf("\x1b[2J");
 
-    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.4.6");
+    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.4.8");
     printf("%-15s\n", "----------------------------------");
     if (connection == 0)
     {
@@ -297,25 +297,22 @@ void *api_mainnet(void *arg)
       tokens.push_back(token);
     }
     int u = 1;
-    std::ofstream outputFile;
-    if (strcmp(cm_output, "true") == 0)
-    {
-      outputFile.open("output.mainnet");
-    }
     const char *path = "/";
     DiskSpaceInfo data = getDiskSpaceInfo(path);
     double used_space = bytesToGigabytes(data.used_space);
     double total_space = bytesToGigabytes(data.total_space);
-    if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
-    {
-      outputFile << "\"DNSU\":1000" << std::endl;
-      outputFile << "\"status\":" << rpc_main_con << std::endl;
-      outputFile << "\"cpu\":" << sa_sys_cpu << std::endl;
-      outputFile << "\"ram_used\":" << sa_sys_ram_used << std::endl;
-      outputFile << "\"ram_total\":" << sa_sys_ram_total << std::endl;
-      outputFile << "\"disk_used\":" << used_space << std::endl;
-      outputFile << "\"disk_total\":" << total_space << std::endl;
-      outputFile << "\"uptime\":" << m_uptime << std::endl;
+    struct json_object *jsonObj = json_object_new_object();
+    if (strcmp(cm_output, "true") == 0)
+    {  
+        // Add value to the JSON object
+        json_object_object_add(jsonObj, "DNSU", json_object_new_int(0001));
+        json_object_object_add(jsonObj, "status", json_object_new_int(rpc_main_con));
+        json_object_object_add(jsonObj, "cpu", json_object_new_int(sa_sys_cpu));
+        json_object_object_add(jsonObj, "ram_used", json_object_new_int(sa_sys_ram_used));
+        json_object_object_add(jsonObj, "ram_total", json_object_new_int(sa_sys_ram_total));
+        json_object_object_add(jsonObj, "disk_used", json_object_new_int(used_space));
+        json_object_object_add(jsonObj, "disk_total", json_object_new_int(total_space));
+        json_object_object_add(jsonObj, "uptime", json_object_new_int(m_uptime));
     }
 
     for (const std::string &s : tokens)
@@ -328,45 +325,55 @@ void *api_mainnet(void *arg)
         sub_str = s.substr(pos);
         if (s.find("block") == 1)
         {
-          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          if (strcmp(cm_output, "true") == 0)
           {
-            outputFile << "\"block\":" << sub_str << std::endl;
+            // Add value to the JSON object
+            const char* cString = sub_str.c_str();
+            json_object_object_add(jsonObj, "block", json_object_new_string(cString));
           }
           m_blocks = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("headers") == 1)
         {
-          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          if (strcmp(cm_output, "true") == 0)
           {
-            outputFile << "\"headers\":" << sub_str << std::endl;
+            // Add value to the JSON object
+            const char* cString = sub_str.c_str();
+            json_object_object_add(jsonObj, "headers", json_object_new_string(cString));
           }
           m_headers = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("protocolversion") == 1)
         {
-          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          if (strcmp(cm_output, "true") == 0)
           {
-            outputFile << "\"protocolversion\":" << sub_str << std::endl;
+            // Add value to the JSON object
+            const char* cString = sub_str.c_str();
+            json_object_object_add(jsonObj, "protocolversion", json_object_new_string(cString));
           }
           m_version = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("connections") == 1)
         {
-          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          if (strcmp(cm_output, "true") == 0)
           {
-            outputFile << "\"connections\":" << sub_str << std::endl;
+            // Add value to the JSON object
+            const char* cString = sub_str.c_str();
+            json_object_object_add(jsonObj, "connections", json_object_new_string(cString));
           }
           m_connections = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("size") == 1)
         {
-          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          if (strcmp(cm_output, "true") == 0)
           {
-            outputFile << "\"transactions\":" << sub_str << std::endl;
+            // Add value to the JSON object
+            const char* cString = sub_str.c_str();
+            json_object_object_add(jsonObj, "transactions", json_object_new_string(cString));
           }
           m_transactions = std::stoi(sub_str);
           u = 2;
@@ -382,10 +389,18 @@ void *api_mainnet(void *arg)
         }
       }
     }
-    if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+    if (strcmp(cm_output, "true") == 0)
     {
-      outputFile.close();
+        //Write the JSON object to a file
+        const char *filename = "mainnet.json";
+        FILE *file = fopen(filename, "w");
+        if (file) {
+            fprintf(file, "%s\n", json_object_to_json_string_ext(jsonObj, JSON_C_TO_STRING_PRETTY));
+            fclose(file);
+        }
     }
+        //Release memory
+        json_object_put(jsonObj);
     if (rpc_main_con == 1)
     {
       if (m_set_uptime == 0)
@@ -448,26 +463,22 @@ void *api_testnet(void *arg)
     std::vector<std::string> tokens;
     std::stringstream ss(result);
     std::string token;
-    std::ofstream outputFile;
-    if (strcmp(ct_output, "true") == 0)
-    {
-      outputFile.open("output.testnet");
-    }
     const char *path = "/";
     DiskSpaceInfo data = getDiskSpaceInfo(path);
     double used_space = bytesToGigabytes(data.used_space);
     double total_space = bytesToGigabytes(data.total_space);
-
-    if (outputFile.is_open() && strcmp(ct_output, "true") == 0)
+    struct json_object *jsonObj = json_object_new_object();
+    if (strcmp(ct_output, "true") == 0)
     {
-      outputFile << "\"DNSU\":1000" << std::endl;
-      outputFile << "\"status\":" << rpc_test_con << std::endl;
-      outputFile << "\"cpu\":" << sa_sys_cpu << std::endl;
-      outputFile << "\"ram_used\":" << sa_sys_ram_used << std::endl;
-      outputFile << "\"ram_total\":" << sa_sys_ram_total << std::endl;
-      outputFile << "\"disk_used\":" << used_space << std::endl;
-      outputFile << "\"disk_total\":" << total_space << std::endl;
-      outputFile << "\"uptime\":" << t_uptime << std::endl;
+        // Add value to the JSON object
+        json_object_object_add(jsonObj, "DNSU", json_object_new_int(0001));
+        json_object_object_add(jsonObj, "status", json_object_new_int(rpc_test_con));
+        json_object_object_add(jsonObj, "cpu", json_object_new_int(sa_sys_cpu));
+        json_object_object_add(jsonObj, "ram_used", json_object_new_int(sa_sys_ram_used));
+        json_object_object_add(jsonObj, "ram_total", json_object_new_int(sa_sys_ram_total));
+        json_object_object_add(jsonObj, "disk_used", json_object_new_int(used_space));
+        json_object_object_add(jsonObj, "disk_total", json_object_new_int(total_space));
+        json_object_object_add(jsonObj, "uptime", json_object_new_int(t_uptime));
     }
     while (std::getline(ss, token, ','))
     {
@@ -482,45 +493,55 @@ void *api_testnet(void *arg)
         sub_str = s.substr(pos);
         if (s.find("block") == 1)
         {
-          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          if (strcmp(ct_output, "true") == 0)
           {
-            outputFile << "\"block\":" << sub_str << std::endl;
+            // Add value to the JSON object
+            const char* cString = sub_str.c_str();
+            json_object_object_add(jsonObj, "block", json_object_new_string(cString));
           }
           t_blocks = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("headers") == 1)
         {
-          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          if (strcmp(ct_output, "true") == 0)
           {
-            outputFile << "\"headers\":" << sub_str << std::endl;
+            // Add value to the JSON object
+            const char* cString = sub_str.c_str();
+            json_object_object_add(jsonObj, "headers", json_object_new_string(cString));
           }
           t_headers = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("protocolversion") == 1)
         {
-          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          if (strcmp(ct_output, "true") == 0)
           {
-            outputFile << "\"protocolversion\":" << sub_str << std::endl;
+            // Add value to the JSON object
+            const char* cString = sub_str.c_str();
+            json_object_object_add(jsonObj, "protocolversion", json_object_new_string(cString));
           }
           t_version = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("connections") == 1)
         {
-          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          if (strcmp(ct_output, "true") == 0)
           {
-            outputFile << "\"connections\":" << sub_str << std::endl;
+            // Add value to the JSON object
+            const char* cString = sub_str.c_str();
+            json_object_object_add(jsonObj, "connections", json_object_new_string(cString));
           }
           t_connections = std::stoi(sub_str);
           u = 2;
         }
         if (s.find("size") == 1)
         {
-          if (outputFile.is_open() && strcmp(cm_output, "true") == 0)
+          if (strcmp(ct_output, "true") == 0)
           {
-            outputFile << "\"transactions\":" << sub_str << std::endl;
+            // Add value to the JSON object
+            const char* cString = sub_str.c_str();
+            json_object_object_add(jsonObj, "transactions", json_object_new_string(cString));
           }
           t_transactions = std::stoi(sub_str);
           u = 2;
@@ -536,10 +557,19 @@ void *api_testnet(void *arg)
         }
       }
     }
-    if (outputFile.is_open() && strcmp(ct_output, "true") == 0)
+    if (strcmp(ct_output, "true") == 0)
     {
-      outputFile.close();
+        //Write the JSON object to a file
+        const char *filename = "testnet.json";
+        FILE *file = fopen(filename, "w");
+        if (file) {
+            fprintf(file, "%s\n", json_object_to_json_string_ext(jsonObj, JSON_C_TO_STRING_PRETTY));
+            fclose(file);
+        }
+
     }
+        //Release memory
+        json_object_put(jsonObj);
     if (rpc_test_con == 1)
     {
       if (t_set_uptime == 0)
