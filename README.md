@@ -13,7 +13,7 @@ Debian / Ubuntu
 
 > cd DNSU
 
-> make
+> make -f Makefile.linux
 
 > mv dnsu.config.template dnsu.config
 
