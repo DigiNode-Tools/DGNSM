@@ -21,14 +21,6 @@
 #include <cstdlib>
 #include "stor.h"
 
-// disk
-typedef struct DiskSpaceInfo
-{
-  unsigned long long total_space;
-  unsigned long long free_space;
-  unsigned long long used_space;
-} DiskSpaceInfo;
-// disk
 
 size_t WriteCallback(void *contents, size_t size, size_t nmemb, std::string *output)
 {
