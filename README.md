@@ -21,7 +21,7 @@ DGNSM (DigiNode Status Monitor) is a tiny software utility that lets you monitor
 
 > git clone https://github.com/DigiNode-Tools/DGNSM/
 
-> cd dgnsm
+> cd DGNSM
 
 > make
 
