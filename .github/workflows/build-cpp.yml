@@ -35,4 +35,8 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: dgnsm-${{ matrix.architecture }}
-          path: path/to/your/binary
+          path: |
+            dgnsm
+            .version
+            dgnsm.config.template
+            dgnsm.config.template2
