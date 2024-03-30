@@ -42,17 +42,24 @@ jobs:
         VERSION_NUMBER=${TAG_NAME#v}
         echo "DGNSM_VER_LOCAL=\"$VERSION_NUMBER\"" > .version
 
+    - name: Create Directory and Move Files
+      run: |
+        TAG_NAME=${GITHUB_REF##*/}
+        DIRECTORY=dgnsm-${TAG_NAME}
+        mkdir $DIRECTORY
+        mv dgnsm .version dgnsm.config.template dgnsm.config.template2 $DIRECTORY/
+
     - name: Package Binary and Config Files
       run: |
         TAG_NAME=${GITHUB_REF##*/}
-        TAR_NAME=DGNSM-${TAG_NAME}-${{ matrix.name_suffix }}.tar.gz
-        tar -czvf $TAR_NAME dgnsm .version dgnsm.config.template dgnsm.config.template2
+        TAR_NAME=dgnsm-${TAG_NAME}-${{ matrix.name_suffix }}.tar.gz
+        tar -czvf $TAR_NAME dgnsm-${TAG_NAME}
 
     - name: Upload Release Asset
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: DGNSM-*.tar.gz
+        file: dgnsm-*.tar.gz
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
