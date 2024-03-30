@@ -1,4 +1,4 @@
-// DGNSU 1.5.0
+// DGNSM 1.5.0
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -128,7 +128,7 @@ void *menu(void *arg)
     printf("\x1b[1;1H");
     printf("\x1b[2J");
 
-    printf("%-15s %-15s\n", "DIGIBYTENODE.COM", "1.4.8");
+    printf("%-15s %-15s\n", "DigiNode Status Monitor", "1.4.8");
     printf("%-15s\n", "----------------------------------");
     if (connection == 0)
     {
@@ -254,7 +254,7 @@ void *api_mainnet(void *arg)
     if (strcmp(cm_output, "true") == 0)
     {  
         // Add value to the JSON object
-        json_object_object_add(jsonObj, "DGNSU", json_object_new_int(0001));
+        json_object_object_add(jsonObj, "DGNSM", json_object_new_int(0001));
         json_object_object_add(jsonObj, "status", json_object_new_int(rpc_main_con));
         json_object_object_add(jsonObj, "cpu", json_object_new_int(sa_sys_cpu));
         json_object_object_add(jsonObj, "ram_used", json_object_new_int(sa_sys_ram_used));
@@ -420,7 +420,7 @@ void *api_testnet(void *arg)
     if (strcmp(ct_output, "true") == 0)
     {
         // Add value to the JSON object
-        json_object_object_add(jsonObj, "DGNSU", json_object_new_int(0001));
+        json_object_object_add(jsonObj, "DGNSM", json_object_new_int(0001));
         json_object_object_add(jsonObj, "status", json_object_new_int(rpc_test_con));
         json_object_object_add(jsonObj, "cpu", json_object_new_int(sa_sys_cpu));
         json_object_object_add(jsonObj, "ram_used", json_object_new_int(sa_sys_ram_used));
@@ -549,9 +549,9 @@ void stop_thread(int signo)
 int main()
 {
   const char *homeDir = getenv("HOME");
-  std::string sfilePath = std::string(homeDir) + "/.digibyte/dgnsu.config";
+  std::string sfilePath = std::string(homeDir) + "/.digibyte/dgnsm.config";
   std::ifstream config(sfilePath);
-  std::ifstream config2("dgnsu.config");
+  std::ifstream config2("dgnsm.config");
   std::string filePath;
   if (config.is_open())
   {
@@ -560,12 +560,12 @@ int main()
   }
   if (config2.is_open())
   {
-    filePath = "dgnsu.config";
+    filePath = "dgnsm.config";
     config2.close();
   }
   if (filePath == "")
   {
-    printf("%-15s\n", "Error loading configuration file: dgnsu.config");
+    printf("%-15s\n", "Error loading configuration file: dgnsm.config");
     exit(0);
   }
   JJINI reader(filePath);
@@ -658,7 +658,7 @@ int main()
 
   if (strcmp(c_dgbn_api, "") == 0)
   {
-    printf("%-15s\n", "Error loading api key! dgnsu.config");
+    printf("%-15s\n", "Error loading api key! dgnsm.config");
     exit(0);
   }
   

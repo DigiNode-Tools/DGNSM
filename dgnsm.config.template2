@@ -1,5 +1,5 @@
 [hardware]                              ; Hardware
-api=tba8HH7QD742                        ; API key digibytenode.com
+api=tba8HH7QD742                        ; API key diginode.online
 
 [mainnet]
 m_enabled=true

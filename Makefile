@@ -6,8 +6,8 @@ SRCS = main.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
-dgnsu: $(OBJS)
-	$(CXX) $(CXXFLAGS) -o dgnsu $(OBJS) $(LDFLAGS)
+dgnsm: $(OBJS)
+	$(CXX) $(CXXFLAGS) -o dgnsm $(OBJS) $(LDFLAGS)
 
 %.o: %.cpp *.h
 	$(CXX) $(CXXFLAGS) -Wall -Wno-unused -Wno-sign-compare -Wno-reorder -Wno-comment -c -o $@ $<
