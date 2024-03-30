@@ -1,0 +1,54 @@
+name: Build and Release C++ Binaries for ARM64 and x86_64
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - architecture: amd64
+            target: x86_64-linux-gnu
+            name_suffix: x86_64-linux-gnu
+          - architecture: arm64
+            target: aarch64-linux-gnu
+            name_suffix: aarch64-linux-gnu
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++-aarch64-linux-gnu gcc-aarch64-linux-gnu
+        sudo apt-get install -y g++-multilib gcc-multilib
+        sudo apt-get install -y build-essential libcurl4-openssl-dev libjson-c-dev
+
+    - name: Build
+      run: make ARCH=${{ matrix.architecture }}
+      env:
+        CC: ${{ matrix.target }}-gcc
+        CXX: ${{ matrix.target }}-g++
+
+    - name: Prepare .version File
+      run: |
+        TAG_NAME=${GITHUB_REF##*/}
+        VERSION_NUMBER=${TAG_NAME#v}
+        echo "DGNSM_VER_LOCAL=\"$VERSION_NUMBER\"" > .version
+
+    - name: Package Binary and Config Files
+      run: |
+        TAG_NAME=${GITHUB_REF##*/}
+        TAR_NAME=DGNSM-${TAG_NAME}-${{ matrix.name_suffix }}.tar.gz
+        tar -czvf $TAR_NAME dgnsm .version dgnsm.config.template dgnsm.config.template2
+
+    - name: Upload Release Asset
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: DGNSM-*.tar.gz
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
