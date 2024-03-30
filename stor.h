@@ -45,7 +45,7 @@
   char *ct_output;
 
 // Api url
-  char api_url[] = "https://digibytenode.com/api";
+  char api_url[] = "https://diginode.online/api";
 
 volatile int run = 1;
 typedef struct DiskSpaceInfo
