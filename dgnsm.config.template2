@@ -1,5 +1,5 @@
-[hardware]                              ; Hardware
-api=tba8HH7QD742                        ; API key diginode.online
+[hardware]
+api=tba8HH7QD742
 
 [mainnet]
 m_enabled=true

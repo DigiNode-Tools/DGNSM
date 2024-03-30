@@ -1,4 +1,4 @@
-// DGNSM 1.5.0
+// DGNSM 1.5.1 (Also update this on line 131 below and in the .version file)
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -128,7 +128,7 @@ void *menu(void *arg)
     printf("\x1b[1;1H");
     printf("\x1b[2J");
 
-    printf("%-15s %-15s\n", "DigiNode Status Monitor", "1.4.8");
+    printf("%-15s %-15s\n", "DigiNode Status Monitor", "1.5.1");
     printf("%-15s\n", "----------------------------------");
     if (connection == 0)
     {
