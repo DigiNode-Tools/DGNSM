@@ -3,10 +3,10 @@
 DGNSM (DigiNode Status Monitor) is a tiny software utility that lets you monitor the status of your DigiByte Node from anywhere via the [diginode.online](https://diginode.online) website.
 
 - Monitor your local DigiByte mainnet and/or testnet node from anywhere
-- Includes block height, peer count, sync status, uptime
-- Also monitors system usage - cpu, memory and disk space
-- No email required - sign in with [Digi-ID](https://www.digi-id.io/)
-- Safe - no wallet information ever leaves your node
+- Displays node block height, peer count, sync status, uptime and more
+- Also displays system status - cpu, memory and disk usage
+- Anonymous - sign in with [Digi-ID](https://www.digi-id.io/) (No email required)
+- Safe - no wallet information ever leaves your DigiByte node and no RPC ports are exposed to the internet
 
 ### diginode.online
 ![diginode.online](https://github.com/Jongjan88/DNSU/assets/125610144/c94a44fb-86ef-49e3-a24c-72c706fa655c)
